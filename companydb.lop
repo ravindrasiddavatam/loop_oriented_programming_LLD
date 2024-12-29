@@ -1,0 +1,183 @@
+employees := <0 0 0 0 0 0 0 0 0 0 0 0 0 0>
+customers := <0 0 0 0 0 0 0 0 0 0 0 0 0 0>
+numberEmp := 1
+numberCust := 1
+employeeObject: [
+  |name email phone salary|
+
+  constructor(name, email, phone, salary){
+    my:name := name
+    my:email := email
+    my:phone := phone
+    my:salary := salary
+    stop
+  }
+
+  function print() {
+    display name
+    display "\t<"
+    display email
+    display ">\tPhone: "
+    display phone
+    display "\tSalary: $"
+    display salary
+    display "\n"
+    stop
+  }
+]
+
+customerObject: [
+  |name email phone purchasesList numberPur|
+
+  constructor(name, email, phone){
+    my:name := name
+    my:email := email
+    my:phone := phone
+    my:purchasesList := <0 0 0 0 0 0 0 0 0 0 0 0 0 0>
+    numberPur := 1
+    stop
+  }
+
+  function setExample(purchasess) {
+    numberPur := purchasess
+    stop
+  }
+
+  function printPerson() {
+    display name
+    display "\t<"
+    display email
+    display ">\tPhone: "
+    display phone
+    display "\n"
+    stop
+  }
+]
+
+purchaseObject: [
+  |ite price qty|
+
+  constructor(i, p, q){
+    ite := i
+    my:price := p
+    my:qty := q
+    stop
+  }
+
+  function printPurchase() {
+    display ite
+    display "\t\t\t"
+    display price
+    display "\t\t"
+    display my:qty
+    display "\t\t"
+    display price * my:qty
+    display "\n"
+    stop
+  }
+]
+
+{
+  display "\tMAIN MENU\n"
+  display "1.) Employees\n"
+  display "2.) Sales\n"
+  display "3.) Quit\n\n"
+  prompt "Choice? " choice
+  if choice = 1 then {
+    prompt "(A)dd Employee or (M)ain Menu? " userChoiceEmp
+    if userChoiceEmp = "M" then stop
+    if userChoiceEmp = "A" then {
+      prompt "Name: " nameEmp
+      prompt "Email: " nameEmail
+      prompt "Phone: " namePhone
+      prompt "Salary: " nameSalary
+
+      display "\n"
+      employees_numberEmp := new employeeObject(nameEmp, nameEmail, namePhone, nameSalary)
+      numberEmp := numberEmp + 1
+      empIdx := 1
+      {
+        employees_empIdx:print()
+        empIdx := empIdx + 1
+        if empIdx = numberEmp then stop
+      }
+      display "\n"
+      stop
+    }
+  }
+  if choice = 2 then {
+    prompt "(A)dd Customer, Enter a (S)ale, (V)iew Customer, or (M)ain Menu? " userChoiceSales
+    if userChoiceSales = "M" then stop
+    if userChoiceSales = "A" then {
+      prompt "Name: " nameEmp
+      prompt "Email: " nameEmail
+      prompt "Phone: " namePhone
+
+      display "\n"
+      customers_numberCust := new customerObject(nameEmp, nameEmail, namePhone)
+      numberCust := numberCust + 1
+      stop
+    }
+    if userChoiceSales = "V" then {
+      if numberCust = 1 then {
+        display "Error: No Customers!\n"
+        stop
+      }
+      if numberCust = 1 then stop
+      empIdx := 1
+      {
+        display empIdx
+        display ".) "
+        display customers_empIdx:name
+        display "\n"
+        empIdx := empIdx + 1
+        if empIdx = numberCust then stop
+      }
+      display "\n"
+      prompt "Choice? " userChoicePur
+      if userChoicePur < numberCust then {
+        customers_userChoicePur:printPerson()
+        display "\n\nOrder History\nItem\t\t\tPrice\tQuantity\tTotal\n"
+        purIdx := 1
+        whatpurchase := customers_userChoicePur:numberPur
+        {
+          if purIdx >= whatpurchase then stop
+          purr := customers_userChoicePur:purchasesList_purIdx
+          purr:printPurchase()
+          purIdx := purIdx + 1
+        }
+        stop
+      }
+      stop
+    }
+    if userChoiceSales = "S" then {
+      if numberCust = 1 then {
+        display "Error: No Customers!\n"
+        stop
+      }
+      if numberCust = 1 then stop
+      empIdx := 1
+      {
+        display empIdx
+        display ".) "
+        display customers_empIdx:name
+        display "\n"
+        empIdx := empIdx + 1
+        if empIdx = numberCust then stop
+      }
+      display "\n"
+      prompt "Choice? " userChoicePur
+      if userChoicePur < numberCust then {
+        prompt "Item: " item
+        prompt "Quantity: " qty
+        prompt "Cost: " cost
+        purcIndex := customers_userChoicePur:numberPur
+        customers_userChoicePur:purchasesList_purcIndex := new purchaseObject(item, cost, qty)
+        customers_userChoicePur:setExample(purcIndex + 1)
+        stop
+      }
+      stop
+    }
+  }
+  if choice = 3 then stop
+}

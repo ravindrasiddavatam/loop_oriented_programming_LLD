@@ -1,0 +1,421 @@
+Original Grammar
+================
+< Expression >   ::= < Lop-Loop >  
+                    | < If >  
+                    | < Display >  
+                    | < Input >  
+                    | < Func-Define >  
+                    | < Ref >   ":=" < Expression >  
+                    | < Compare >
+
+< Compare >   ::= < Compare >   "=" < If-Condition >  
+                   | < Compare >   "< > " < If-Condition >  
+                   | < If-Condition >  
+
+< If-Condition >         ::= < If-Condition >   "<" < Sum >  
+                   | < If-Condition >   " > " < Sum >  
+                   | < If-Condition >   "<=" < Sum >  
+                   | < If-Condition >   " > =" < Sum >  
+                   | < Sum >  
+
+< Multi-Sum >      ::= < Sum >  < Multi-Sum >  
+                        | ""
+
+< Sum >          ::= < Sum >   "+" < Term >  
+                   | < Sum >   "-" < Term >  
+                   | < Term >  
+                   
+< Term >         ::= < Term >   "*" < Factor >  
+                   | < Term >   "/" < Factor >  
+                   | < Term >   "%" < Factor >  
+                   | < Factor >  
+
+< Factor >       ::= < Factor >   "^" < Unary >  
+                   | < Unary >  
+
+< Unary >         ::= "+" < Expression >  
+                    | "-" < Expression >  
+                    | "#" < Expression >  
+                    | < Func-Callable >  
+
+< Func-Callable >   ::= < Id >   "(" < Multi-Sum >   ")"
+                    | < Ref >  
+                    | < Low-Level >  
+                    | < Object-New >   
+
+< Object-New >   ::= "new" < Id >   "(" < Multi-Sum >   ")"
+                   
+< Low-Level >        ::= < Array >  
+                        | < Literal >  
+
+< Array >             ::= "< " < Literals >   " > "
+
+< Literal >     ::= < Number >   | < String >  
+
+< Literals >          ::= < Literal >   < Literals >   | < Literal >   
+
+< Object-Statements >   ::= < Object-Statement >   < Object-Statements >   
+                            | < Object-Statement >  
+
+< Object-Statement >   ::= < Func-Define >  
+                            | < Constructor >  
+                            | < Object-Variables >     
+
+< Object-Variables >   ::= "|" < Ids-Spaces >   "|"
+
+< Ref >          ::= < Id >   ":" < Id >  
+                    | < Id >   ":" < Id >   "(" < Multi-Sum >   ")"
+                    | < Id >   "_" < Id > 
+                    | <Id> ":" "[" < Object-Statements >  "]" 
+                    | < Id >   
+
+< If >   ::= "if" < Compare >   "then" < Expression >                      
+
+< Display >   ::= "display" < Ref >   | "display" < Literal >      
+
+< Input >   ::= "read" < Ref >   | "prompt" < String >   < Ref >  
+
+< Func-Define >   ::= "function" < Id >   "(" < Ids >   ")" < Lop-Loop >    
+
+< Ids >   = < Id >   "," < Ids >   | < Id >   | ""
+
+< Statements >   ::= < Expression >   < Statements >   | < Expression >   | "stop"
+
+< Lop-Loop >   ::= "{" Statements "}"
+
+< Ids-Spaces >   ::= < Id >   < Ids-Spaces >   | < Id >  
+
+< Constructor >   ::= "constructor" "(" < Ids >   ")" < Lop-Loop >    
+
+< Id >           ::= < Char >  
+                   | < Ref >   < Char >   
+                   | < Ref >   < Digit >  
+                   
+< Number >       ::= < Integer >   | < Real >  
+
+< Integer >      ::= < Integer >   < Digit >  
+                   | < Digit >  
+
+< Real >         ::= < Integer >   "." < Integer >  
+
+< String >        ::= "\"" < Chars >   "\""
+
+< Chars >         ::= < Char >   < Chars >   | < Char >  
+
+< Digit >        ::= "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+
+
+
+LL(1) Grammar
+=============
+This is the grammar after tranforming the relevant parts into LL(1).
+
+< Expression >       ::= < Lop-Loop >  
+                        | < If >  
+                        | < Display >  
+                        | < Input >  
+                        | < Func-Define >  
+                        | < L-Value >  ":=" < Expression >  
+                        | < Compare > 
+
+< Statements >       ::= < Expression >  < Statements' > 
+
+< Statements' >   ::= < Expression >  < Statements' >  | "stop" | ""
+
+< Lop-Loop >             ::= "{" < Statements >  "}"
+
+< If >               ::= "if" < Compare >  "then" < Expression > 
+
+< Display >          ::= "display" < Ref >  
+                        | "display" < Literal > 
+
+< Input >            ::= "read" < Ref >  
+                        | "prompt" < String >  < Ref > 
+
+< Func-Define >     ::= "function" < Id >  "(" < Ids >  ")" < Lop-Loop > 
+
+< Ids >              ::= < Id >  < Ids' >  | ""
+
+< Ids' >             ::= "," < Id >  < Ids' > 
+                        | ""
+
+< Object-Variables >        ::= "|" < Ids-Spaces >  "|"
+
+< Ids-Spaces >       ::= < Id >  < Ids-Spaces' >  | ""
+
+< Ids-Spaces' >   ::= < Id >  < Ids-Spaces' >  
+                        | ""
+
+< Constructor >      ::= "constructor" "(" < Ids >  ")" < Lop-Loop > 
+
+< Compare >  ::= < If-Condition >  < Compare' > 
+
+< Compare' >  ::= "=" < If-Condition >  < Compare' > 
+                            | "< >  " < If-Condition >  < Compare' > 
+                            | ""
+
+< If-Condition >        ::= < Sum >  < If-Condition' > 
+
+< If-Condition' >       ::= "<" < Sum >  < If-Condition' > 
+                        | " > " < Sum >  < If-Condition' > 
+                        | "<=" < Sum >  < If-Condition' > 
+                        | " >=" < Sum >  < If-Condition' > 
+                        | ""
+
+
+< Multi-Sum >      ::= < Sum >  < Multi-Sum >  
+                        | ""
+
+< Sum >              ::= < Term >  < Sum' > 
+
+< Sum' >             ::= "+" < Term >  < Sum' >  
+                        | "-" < Term >  < Sum' >  
+                        | ""
+
+< Term >             ::= < Factor >  < Term' > 
+
+< Term' >            ::= "*" < Factor >  < Term' >  
+                        | "/" < Factor >  < Term' >  
+                        | "%" < Factor >  < Term' >  
+                        | ""
+
+< Factor >           ::= < Unary >  < Factor' > 
+
+< Factor' >          ::= "^" < Unary >  < Factor' >  
+                        | ""
+
+< Unary >            ::= "-" < Expression >  
+                        | "+" < Expression >  
+                        | "#" < Low-Level >  
+                        | < Func-Callable > 
+
+< Func-Callable >    ::= < Id >  "(" < Multi-Sum >  ")" 
+                        | < Ref >  
+                        | < Low-Level >  
+                        | < Object-New > 
+
+< Object-New >       ::= "new" < Id >  "(" < Multi-Sum >  ")"
+
+< Low-Level >        ::= < Array >  
+                        | < Literal > 
+
+< Array >            ::= "< " < Literals >  " > "
+
+< Literal >          ::= < Number >  
+                        | < String > 
+
+< Literals >         ::= < Literal >  < Literals' > 
+
+< Literals' >        ::= < Literal >  < Literals' >  
+                        | ""
+
+< Ref >              ::= < Id >  ":" < Id >  
+                        | < Id >  ":" < Id >  "(" < Multi-Sum >  ")" 
+                        | < Id >  "_" < Integer > 
+                        | <Id> ":" "[" < Object-Statements >  "]"  
+                        | < Id > 
+
+< Object-Statements >  ::= < Object-Statement >  < Object-Statements' > 
+
+< Object-Statements' >  ::= < Object-Statement >  < Object-Statements' >  
+                            | ""
+
+< Object-Statement >  ::= < Func-Define >  
+                        | < Constructor >  
+                        | < Object-Variables > 
+
+< L-Value >          ::= < Ref > 
+
+< Id >               ::= < Char >  < Id' > 
+                        | < Char > 
+
+< Id' >              ::= < Char >  < Id' > 
+                        | < Digit >  < Id' > 
+                        | ""
+
+< Number >           ::= < Integer >  
+                        | < Real > 
+
+< Integer >          ::= < Integer >  < Digit >  
+                        | < Digit > 
+
+< Real >             ::= < Integer >  "." < Integer > 
+
+< String >           ::= "\"" < Chars >  "\""
+
+< Chars >            ::= < Char >  < Chars' > 
+
+< Chars' >           ::= < Char >  < Chars' >  
+                        | ""
+
+< Digit >            ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+
+
+
+Parser Grammar
+==============
+This is the grammar with the tokens removed and placed in a lexer grammar.
+
+< Expression >       ::= < Lop-Loop >  
+                        | < If >  
+                        | < Display >  
+                        | < Input >  
+                        | < Func-Define >  
+                        | < Ref >  ASSIGN < Expression >  
+                        | < Compare > 
+
+< Sum >              ::= < Term >  < Sum' > 
+
+< Sum' >             ::= ADD < Term >  < Sum' >  
+                        | SUB < Term >  < Sum' >  
+                        | ""
+
+< Term >             ::= < Factor >  < Term' > 
+
+< Term' >            ::= MUL < Factor >  < Term' >  
+                        | DIV < Factor >  < Term' >  
+                        | MODULUS < Factor >  < Term' >  
+                        | ""
+
+< Factor >           ::= < Unary >  < Factor' > 
+
+< Factor' >          ::= POW < Unary >  < Factor' >  
+                        | ""
+
+< Unary >            ::= SUB < Expression >  
+                        | ADD < Expression >  
+                        | HASH < Low-Level >  
+                        | < Func-Callable > 
+
+< Multi-Sum >      ::= < Sum >  < Multi-Sum' >  
+                        | ""
+
+< Multi-Sum' >     ::= < Sum >  < Multi-Sum' >  
+                        | ""
+
+< Statements >       ::= < Expression >  < Statements' > 
+
+< Statements' >   ::= < Expression >  < Statements' >  | STOP | ""
+
+< Lop-Loop >             ::= LFLOWER < Statements >  RFLOWER
+
+< If >               ::= IF < Compare >  THEN < Expression > 
+
+< Display >          ::= DISPLAY < Display' > 
+
+< Display' >         ::= < Ref > 
+                        | < Literal > 
+
+< Input >            ::= READ < Ref >  
+                        | PROMPT < String >  < Ref > 
+
+< Func-Define >     ::= FUNCTION < Id >  LPAREN < Ids >  RPAREN < Lop-Loop > 
+
+< Ids >              ::= < Id >  < Ids' >  
+                        | ""
+
+< Ids' >             ::= COMMA < Id >  < Ids' > 
+                        | ""
+
+< Object-Variables >        ::= PIPEREG < Ids-Spaces >  PIPEREG
+
+< Ids-Spaces >       ::= < Id >  < Ids-Spaces' >  
+                        | ""
+
+< Ids-Spaces' >      ::= < Id >  < Ids-Spaces' >  
+                        | ""
+
+< Compare >  ::= < If-Condition >  < Compare' > 
+
+< Compare' >  ::= EQ < If-Condition >  < Compare' > 
+                            | NOTEQ < If-Condition >  < Compare' > 
+                            | ""
+
+< If-Condition >        ::= < Sum >  < If-Condition' > 
+
+< If-Condition' >       ::= LESSTHAN < Sum >  < If-Condition' > 
+                        | GREATERTHAN < Sum >  < If-Condition' > 
+                        | LESSTHANEQ < Sum >  < If-Condition' > 
+                        | GREATERTHANEQ < Sum >  < If-Condition' > 
+                        | ""
+
+< Func-Callable >    ::= < Id >  LPAREN < Multi-Sum >  RPAREN
+                        | < Ref >  
+                        | < Low-Level >  
+                        | < Object-New > 
+
+< Object-New >       ::= NEW < Id >  LPAREN < Multi-Sum >  RPAREN
+
+< Low-Level >        ::= < Array >  
+                        | < Literal > 
+
+< Array >            ::= LESSTHAN < Literals >  GREATERTHAN
+
+< Literal >          ::= < Number >  
+                        | < String > 
+
+< Literals >         ::= < Literal >  < Literals' > 
+
+< Literals' >        ::= < Literal >  < Literals' >  
+                        | ""
+
+< Ref >              ::= < Id >  COLON < Id >  
+                        | < Id >  COLON < Id >  LPAREN < Multi-Sum >  RPAREN
+                        | < Id >  UNDERSCORE < Integer >  
+                        | < Id > COLON LCLOSE < Object-Statements >  RCLOSE
+                        | < Id > 
+
+< Constructor >      ::= CONSTRUCTOR LPAREN < Ids >  RPAREN < Lop-Loop > 
+
+< Object-Statements >  ::= < Object-Statement >  < Object-Statements' > 
+
+< Object-Statements' >  ::= < Object-Statement >  < Object-Statements' >  
+                            | ""
+
+< Object-Statement >  ::= < Func-Define >  
+                        | < Constructor >  
+                        | < Object-Variables > 
+
+Lexer Grammar
+=============
+This is the set of regular expressions defining the tokens.
+
+FUNCTION    function
+POINT   point
+IF  if
+THEN    then
+STOP    stop
+LFLOWER   {
+RFLOWER   }
+LESSTHAN  < 
+LESSTHANEQ <=
+GREATERTHAN  >  
+GREATERTHANEQ >=
+EQ  =
+NOTEQ < > 
+COMMA   ,
+HASH    #
+NEW new
+STRING  \"[^\"]*\"
+ID  [a-zA-Z_][a-zA-Z0-9_]*
+READ    read
+PROMPT  prompt
+DISPLAY display
+COLON   :
+UNDERSCORE  _
+MODULUS %
+CONSTRUCTOR constructor
+LCLOSE [
+RCLOSE ]
+PIPEREG    |
+ADD         +
+SUB         -
+MUL         *
+DIV         /
+POW         ^
+LPAREN      \(
+RPAREN      \)
+INT         [0-9]+
+REAL        [0-9]+\.[0-9]+
+ID          [a-zA-Z_][a-zA-Z_0-9]*
+ASSIGN      :=
